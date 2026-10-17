@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { getDonations } from '../data/store';
-import { Status, DonationType } from '../types';
-import { Filter, Download, ExternalLink } from 'lucide-react';
+import { getDonations, getSourceById } from '../data/store';
+import { Status, DonationType, SourceGrade } from '../types';
+import { Filter, Download, ExternalLink, AlertTriangle } from 'lucide-react';
 
 const STATUS_COLORS: Record<Status, string> = {
   [Status.RECEIVED]:    'bg-green-100 text-green-800',
@@ -40,8 +40,8 @@ const Donations: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Donation Ledger</h2>
-          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} entries — every record has a source link</p>
+          <h2 className="text-xl font-bold text-gray-900">Assistance</h2>
+          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} source-linked records. Only cash records carry a JMD amount; in-kind support is not monetised.</p>
         </div>
         <div className="flex space-x-2 mt-4 sm:mt-0">
           <div className="relative">
@@ -76,7 +76,7 @@ const Donations: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donor</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount/Value</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documented value</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parish</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
@@ -94,8 +94,8 @@ const Donations: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{d.type}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">
                     {d.type === DonationType.CASH
-                      ? `$${d.amount.toLocaleString()}`
-                      : `~$${d.amount.toLocaleString()}`}
+                      ? `J$${d.amount.toLocaleString()}`
+                      : d.amount > 0 ? `Reported value: J$${d.amount.toLocaleString()}` : 'Not monetised'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{d.targetParish}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -104,15 +104,32 @@ const Donations: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a
-                      href={d.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-900 inline-flex items-center justify-end"
-                      title={d.sourceUrl}
-                    >
-                      Proof <ExternalLink className="w-3 h-3 ml-1" />
-                    </a>
+                    <div className="flex items-center justify-end gap-2">
+                      {d.provenance?.flags && d.provenance.flags.length > 0 && (
+                        <span title={d.provenance.flags.join('; ')} className="text-amber-500">
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                        </span>
+                      )}
+                      {d.provenance?.sourceId && d.provenance.sourceId.startsWith('src-') && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                          getSourceById(d.provenance.sourceId)?.grade === SourceGrade.OFFICIAL ? 'bg-green-100 text-green-700' :
+                          getSourceById(d.provenance.sourceId)?.grade === SourceGrade.PRIMARY ? 'bg-blue-100 text-blue-700' :
+                          getSourceById(d.provenance.sourceId)?.grade === SourceGrade.SECONDARY ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {getSourceById(d.provenance.sourceId)?.grade ?? '—'}
+                        </span>
+                      )}
+                      <a
+                        href={d.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-900 inline-flex items-center"
+                        title={d.sourceUrl}
+                      >
+                        Proof <ExternalLink className="w-3 h-3 ml-1" />
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { DollarSign, Package, Truck, Home, Activity, Users } from 'lucide-react';
+import { DollarSign, Package, Truck, FileText, Activity, Users } from 'lucide-react';
 import KPICard from '../components/KPICard';
 import { getKPIs, getDonations, getLastUpdated } from '../data/store';
 import { DonationType } from '../types';
@@ -11,9 +11,9 @@ const Overview: React.FC = () => {
   const lastUpdated = getLastUpdated();
 
   const formatCurrency = (val: number) => {
-    if (val >= 1_000_000) return `$${(val / 1_000_000).toFixed(1)}M`;
-    if (val >= 1_000) return `$${(val / 1_000).toFixed(0)}K`;
-    return `$${val.toLocaleString()}`;
+    if (val >= 1_000_000) return `J$${(val / 1_000_000).toFixed(1)}M`;
+    if (val >= 1_000) return `J$${(val / 1_000).toFixed(0)}K`;
+    return `J$${val.toLocaleString()}`;
   };
   const formatCompact = (val: number) =>
     new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(val);
@@ -28,10 +28,10 @@ const Overview: React.FC = () => {
     { name: 'Disbursed', value: kpis.totalDisbursed },
   ];
 
-  // Pie derived from real donation types
+  // Assistance is counted by record type. In-kind support is deliberately not given a cash value.
   const typeTotals = Object.values(DonationType).map(type => ({
     name: type,
-    value: donations.filter(d => d.type === type).reduce((s, d) => s + d.amount, 0),
+    value: donations.filter(d => d.type === type).length,
   })).filter(t => t.value > 0);
 
   const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
@@ -44,8 +44,8 @@ const Overview: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Jamaica Relief Tracker</h2>
-          <p className="text-sm text-gray-500">Independent civic ledger — all data sourced and verified</p>
+          <h2 className="text-2xl font-bold text-gray-900">Situation: source-backed recovery snapshot</h2>
+          <p className="text-sm text-gray-500">A dated civic evidence ledger, not a live operational feed.</p>
         </div>
         <div className="mt-2 md:mt-0">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
@@ -54,34 +54,42 @@ const Overview: React.FC = () => {
         </div>
       </div>
 
+      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Amounts are only combined where they are documented as JMD cash. Assistance, reports, and reported people or units are kept separate because they measure different things.
+      </div>
+
+      <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+        <strong>Scope:</strong> This ledger records claims as they appeared in source documents published between October 2025 and April 2026. It does not track real-time disbursements, verify delivery on the ground, or confirm that pledged funds reached recipients. Dates shown are publication or announcement dates — not delivery dates.
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <KPICard
-          title="Total Cash Received"
+          title="Documented Cash Records"
           value={formatCurrency(kpis.totalCashReceived)}
-          subValue={`${donations.filter(d => d.type === DonationType.CASH).length} cash donations`}
+          subValue={`${donations.filter(d => d.type === DonationType.CASH).length} cash records, JMD`}
           icon={DollarSign}
           color="green"
           trend="up"
         />
         <KPICard
-          title="Est. Value (In-Kind)"
-          value={formatCurrency(kpis.totalValueKind)}
-          subValue="Food, supplies, equipment"
+          title="In-Kind Assistance Records"
+          value={kpis.inKindRecordCount}
+          subValue="Not converted to a cash value"
           icon={Package}
           color="blue"
         />
         <KPICard
-          title="Relief Distributed"
+          title="Cash Records Marked Distributed"
           value={formatCurrency(kpis.totalDisbursed)}
-          subValue={`${distributionRate}% distribution rate`}
+          subValue={`${distributionRate}% of documented cash records`}
           icon={Truck}
           color="purple"
         />
         <KPICard
-          title="Families Assisted"
-          value={kpis.familiesHelped > 0 ? formatCompact(kpis.familiesHelped) : '—'}
-          subValue="Updated manually"
-          icon={Home}
+          title="Source-Backed Records"
+          value={formatCompact(kpis.sourceBackedRecordCount)}
+          subValue="Donations, reports, commitments"
+          icon={FileText}
           color="yellow"
         />
         <KPICard
@@ -103,7 +111,8 @@ const Overview: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 lg:col-span-2">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Funds Flow</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">Cash record status (JMD)</h3>
+          <p className="text-xs text-gray-500 mb-4">In-kind assistance is excluded because it has not been monetised.</p>
           {chartData.every(d => d.value === 0) ? (
             <div className="h-64 flex items-center justify-center text-gray-400 text-sm">
               No financial data yet — add donations to see flow
@@ -124,7 +133,8 @@ const Overview: React.FC = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Donation Breakdown</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">Assistance record types</h3>
+          <p className="text-xs text-gray-500 mb-4">Number of records, not a value comparison.</p>
           {typeTotals.length === 0 ? (
             <div className="h-64 flex items-center justify-center text-gray-400 text-sm text-center">
               No donations yet
@@ -146,7 +156,7 @@ const Overview: React.FC = () => {
                       <Cell key={index} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                  <Tooltip formatter={(value: number) => `${value} record${value === 1 ? '' : 's'}`} />
                   <Legend verticalAlign="bottom" height={36} />
                 </PieChart>
               </ResponsiveContainer>

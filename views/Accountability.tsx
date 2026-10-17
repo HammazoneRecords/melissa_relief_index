@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { getPromises } from '../data/store';
-import { Status } from '../types';
+import { getPromises, getSourceById } from '../data/store';
+import { Status, SourceGrade } from '../types';
 import { AlertCircle, CheckCircle, Clock, ExternalLink } from 'lucide-react';
 
 const Accountability: React.FC = () => {
@@ -9,8 +9,8 @@ const Accountability: React.FC = () => {
   return (
     <div className="space-y-6">
        <div className="bg-slate-900 text-white p-6 rounded-xl shadow-md">
-            <h2 className="text-2xl font-bold mb-2">Balance The Books</h2>
-            <p className="text-slate-300">Tracking government promises against actual delivered results. This section compares public announcements with validated field data.</p>
+            <h2 className="text-2xl font-bold mb-2">Recovery Commitments</h2>
+            <p className="text-slate-300">Tracks source-linked public commitments and the evidence currently connected to this ledger. A record date is not automatically a delivery deadline.</p>
        </div>
 
        {promises.length === 0 && (
@@ -40,7 +40,7 @@ const Accountability: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
                             {/* Financials */}
                             <div>
-                                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Budget Utilization</h4>
+                                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Budget figures recorded</h4>
                                 <div className="flex justify-between text-sm mb-1">
                                     <span className="text-gray-600">Spent: <span className="font-semibold text-gray-900">${promise.budgetSpent.toLocaleString()}</span></span>
                                     <span className="text-gray-600">Allocated: <span className="font-semibold text-gray-900">${promise.budgetAllocated.toLocaleString()}</span></span>
@@ -55,9 +55,9 @@ const Accountability: React.FC = () => {
 
                             {/* Timeline/Progress */}
                             <div>
-                                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Project Completion</h4>
+                                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Status recorded in this ledger</h4>
                                 <div className="flex justify-between text-sm mb-1">
-                                    <span className="text-gray-600">Due Date: {promise.promisedDate}</span>
+                                    <span className="text-gray-600">Record date: {promise.promisedDate}</span>
                                     <span className="font-bold text-gray-900">{promise.progress}%</span>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -74,7 +74,23 @@ const Accountability: React.FC = () => {
                     </div>
                     {/* Footer Actions */}
                     <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 flex justify-between items-center">
-                        <span className="text-xs text-gray-500 italic">{promise.ministry ?? 'Ministry not specified'}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500 italic">{promise.ministry ?? 'Ministry not specified'}</span>
+                          {promise.provenance?.sourceId && promise.provenance.sourceId.startsWith('src-') && (() => {
+                            const src = getSourceById(promise.provenance.sourceId);
+                            const grade = src?.grade;
+                            return (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                                grade === SourceGrade.OFFICIAL ? 'bg-green-100 text-green-700' :
+                                grade === SourceGrade.PRIMARY ? 'bg-blue-100 text-blue-700' :
+                                grade === SourceGrade.SECONDARY ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-600'
+                              }`}>
+                                {grade ?? '—'}
+                              </span>
+                            );
+                          })()}
+                        </div>
                         <a
                           href={promise.sourceUrl}
                           target="_blank"

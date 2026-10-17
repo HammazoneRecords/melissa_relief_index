@@ -5,8 +5,13 @@ import Donations from './views/Donations';
 import Accountability from './views/Accountability';
 import CommunityMap from './views/CommunityMap';
 import Reports from './views/Reports';
-import Predictions from './views/Predictions';
+import Verification from './views/Verification';
+import Methods from './views/Methods';
 import AdminPanel from './components/AdminPanel';
+
+// ─── Public Information Architecture (Task 003) ────────────────────────────
+// Situation → Assistance → Parish Needs → Recovery Commitments → Evidence Records → Evidence Gaps
+// Each view declares its scope and limitations.
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -16,10 +21,11 @@ const App: React.FC = () => {
     switch (activeTab) {
       case 'overview': return <Overview />;
       case 'donations': return <Donations />;
-      case 'accountability': return <Accountability />;
       case 'distribution': return <CommunityMap />;
+      case 'accountability': return <Accountability />;
       case 'reports': return <Reports />;
-      case 'predictions': return <Predictions />;
+      case 'verification': return <Verification />;
+      case 'methods': return <Methods />;
       default: return <Overview />;
     }
   };
@@ -36,8 +42,8 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 py-8 mt-12">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            <p>&copy; {new Date().getFullYear()} Melissa Relief Index. All data is verified by community auditors.</p>
-            <p className="mt-2">Built for resilience.</p>
+            <p>&copy; {new Date().getFullYear()} Melissa Relief Index. Source-linked civic evidence ledger.</p>
+            <p className="mt-2">Record dates and source links are shown so claims can be checked in context.</p>
         </div>
       </footer>
     </div>

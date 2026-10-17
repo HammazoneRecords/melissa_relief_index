@@ -9,8 +9,8 @@ const Reports: React.FC = () => {
     <div className="space-y-6">
         <div className="flex justify-between items-center">
             <div>
-                <h2 className="text-2xl font-bold text-gray-900">Field Reports</h2>
-                <p className="text-sm text-gray-500">{reports.length} verified reports — all sourced</p>
+                <h2 className="text-2xl font-bold text-gray-900">Evidence Records</h2>
+                <p className="text-sm text-gray-500">{reports.length} source-linked government, NGO, and community records</p>
             </div>
         </div>
 

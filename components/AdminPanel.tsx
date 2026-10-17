@@ -218,6 +218,7 @@ const ReportForm: React.FC<{ onSaved: () => void; prefillUrl?: string }> = ({ on
     parish: PARISHES[0], communityName: '', reporterType: 'Official' as 'Official' | 'Volunteer' | 'Resident',
     severity: 'Medium' as 'Low' | 'Medium' | 'High' | 'Critical',
     issue: '', sourceUrl: prefillUrl ?? '',
+    verifiedCount: '0', disputedCount: '0',
   });
 
   const submit = (e: React.FormEvent) => {
@@ -229,8 +230,8 @@ const ReportForm: React.FC<{ onSaved: () => void; prefillUrl?: string }> = ({ on
       reporterType: f.reporterType,
       severity: f.severity,
       issue: f.issue,
-      verifiedCount: 0,
-      disputedCount: 0,
+      verifiedCount: Number(f.verifiedCount) || 0,
+      disputedCount: Number(f.disputedCount) || 0,
       timestamp: new Date().toISOString(),
       sourceUrl: f.sourceUrl,
     });
@@ -271,6 +272,14 @@ const ReportForm: React.FC<{ onSaved: () => void; prefillUrl?: string }> = ({ on
         <div className="col-span-2">
           <label className="label">Source URL *</label>
           <input className="input" type="url" required value={f.sourceUrl} onChange={e => set('sourceUrl', e.target.value)} placeholder="https://…" />
+        </div>
+        <div>
+          <label className="label">Verified Count</label>
+          <input className="input" type="number" min="0" value={f.verifiedCount} onChange={e => set('verifiedCount', e.target.value)} />
+        </div>
+        <div>
+          <label className="label">Disputed Count</label>
+          <input className="input" type="number" min="0" value={f.disputedCount} onChange={e => set('disputedCount', e.target.value)} />
         </div>
       </div>
       <button type="submit" className="w-full flex items-center justify-center gap-2 bg-slate-900 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800">

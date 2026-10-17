@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Menu, Search, User } from 'lucide-react';
+import { Activity, Menu, User } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: string;
@@ -9,12 +9,13 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onAdminOpen }) => {
   const navItems = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'donations', label: 'Donations' },
-    { id: 'distribution', label: 'Relief Map' },
-    { id: 'accountability', label: 'Accountability' },
-    { id: 'reports', label: 'Field Reports' },
-    { id: 'predictions', label: 'Predictions Lab' },
+    { id: 'overview', label: 'Situation' },
+    { id: 'donations', label: 'Assistance' },
+    { id: 'distribution', label: 'Parish Needs' },
+    { id: 'accountability', label: 'Recovery Commitments' },
+    { id: 'reports', label: 'Evidence Records' },
+    { id: 'verification', label: 'Evidence Gaps' },
+    { id: 'methods', label: 'Methods' },
   ];
 
   return (
@@ -49,19 +50,6 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onAdminOpen })
 
           {/* Right Controls */}
           <div className="flex items-center space-x-4">
-            <div className="relative hidden sm:block">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-slate-800 text-sm text-white rounded-full pl-8 pr-4 py-1.5 focus:outline-none focus:ring-1 focus:ring-red-500 w-48 transition-all"
-              />
-              <Search className="h-4 w-4 text-gray-400 absolute left-2.5 top-2" />
-            </div>
-            <div className="flex items-center space-x-2 text-sm font-semibold text-gray-300 cursor-pointer hover:text-white">
-               <span>EN</span>
-               <span className="text-gray-600">|</span>
-               <span>PAT</span>
-            </div>
             <button
               onClick={onAdminOpen}
               className="p-1 rounded-full text-gray-400 hover:text-white focus:outline-none"
