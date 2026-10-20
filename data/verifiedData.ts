@@ -277,7 +277,14 @@ const PROVENANCE_OVERRIDES: Record<string, ProvenanceOverride> = {
   // don-012: J$200M diaspora — not a sub-claim of any single record, but
   // is a component of the total national cash relief pool
   'don-012': {
-    flags: ['component: diaspora contribution to national cash relief pool — not an independent total'],
+    parentClaimId: 'don-001',
+    overlapsWith: ['don-001'],
+    flags: ['component: diaspora contribution to national cash relief pool — not an independent total; sub-claim of don-001, excluded from cash totals to avoid double-counting'],
+  },
+
+  // ── Aggregate relief fund is RECEIVED, not disbursed ───────────────────
+  'don-001': {
+    flags: ['received-not-disbursed: J$1.4B collected into the Hurricane Relief Fund. No public per-household disbursement breakdown has been published as of the latest source (Apr 16, 2026).'],
   },
 
   // ── NaRRA multilateral financing — pledged, not received ───────────────
@@ -546,7 +553,7 @@ export const VERIFIED_GOV_PROMISES: GovPromise[] = [
     beneficiary: Beneficiary.INFRASTRUCTURE,
     flags: ['gap: Savanna-la-Mar Hospital at 60% capacity 6+ months post-landfall'],
   },
-],
+];
 
 // ─── Community Reports ─────────────────────────────────────────────────────────
 // Sourced from official dashboards, OPM Parliament statements, NGO reports
@@ -823,10 +830,10 @@ export const VERIFIED_DONATIONS: Donation[] = [
     amount: 1400000000,
     type: DonationType.CASH,
     date: '2026-04-16',
-    status: Status.DISTRIBUTED,
+    status: Status.RECEIVED,
     targetParish: 'All',
     sourceUrl: 'https://supportjamaica.gov.jm/dashboard',
-    notes: 'Aggregate fund collecting public donations, business contributions, and diaspora remittances managed by the Ministry of Finance. Total as of April 16, 2026: J$1.4 Billion (US$9M+). Initial milestone of J$38M + US$728K announced Nov 3, 2025 by Minister Dana Morris Dixon. Not a single government appropriation — reflects thousands of individual and corporate contributions pooled through the official fund.',
+    notes: 'Aggregate fund collecting public donations, business contributions, and diaspora remittances managed by the Ministry of Finance. Total as of April 16, 2026: J$1.4 Billion (US$9M+). Initial milestone of J$38M + US$728K announced Nov 3, 2025 by Minister Dana Morris Dixon. Not a single government appropriation — reflects thousands of individual and corporate contributions pooled through the official fund. Funds are RECEIVED, not fully disbursed: no public breakdown of how much of this cash has reached affected households has been published.',
   },
   {
     id: 'don-002',
@@ -966,10 +973,10 @@ export const VERIFIED_DONATIONS: Donation[] = [
     amount: 200000000,
     type: DonationType.CASH,
     date: '2025-12-01',
-    status: Status.DISTRIBUTED,
+    status: Status.RECEIVED,
     targetParish: 'All',
     sourceUrl: 'https://supportjamaica.gov.jm/dashboard',
-    notes: 'J$200M (approx. US$1.3M) raised through diaspora foundation drives in New York, London, Toronto, and Miami. Funds disbursed through official Hurricane Relief Fund channels.',
+    notes: 'J$200M (approx. US$1.3M) raised through diaspora foundation drives in New York, London, Toronto, and Miami. Funds channelled into the official Hurricane Relief Fund (don-001) — counted here as received, not separately disbursed; household-level disbursement breakdown not publicly disclosed.',
   },
   {
     id: 'don-013',

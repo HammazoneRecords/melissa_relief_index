@@ -41,7 +41,7 @@ const Donations: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Assistance</h2>
-          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} source-linked records. Only cash records carry a JMD amount; in-kind support is not monetised.</p>
+          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} source-linked records. Only cash records carry a JMD amount; in-kind support is not monetised. In-kind entries marked "Distributed" reflect only the specific quantities named in their source document — no consolidated island-wide distribution total has been published.</p>
         </div>
         <div className="flex space-x-2 mt-4 sm:mt-0">
           <div className="relative">

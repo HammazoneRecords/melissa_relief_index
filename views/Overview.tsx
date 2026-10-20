@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { DollarSign, Package, Truck, FileText, Activity, Users } from 'lucide-react';
 import KPICard from '../components/KPICard';
 import { getKPIs, getDonations, getLastUpdated } from '../data/store';
+import { VERIFIED_METRICS } from '../data/verifiedData';
 import { DonationType } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
@@ -38,7 +39,7 @@ const Overview: React.FC = () => {
 
   const lastUpdatedLabel = lastUpdated
     ? new Date(lastUpdated).toLocaleString('en-JM', { dateStyle: 'medium', timeStyle: 'short' })
-    : 'Not yet updated';
+    : 'Source data as of 2026-04-16 (latest source retrieval)';
 
   return (
     <div className="space-y-6">
@@ -62,6 +63,11 @@ const Overview: React.FC = () => {
         <strong>Scope:</strong> This ledger records claims as they appeared in source documents published between October 2025 and April 2026. It does not track real-time disbursements, verify delivery on the ground, or confirm that pledged funds reached recipients. Dates shown are publication or announcement dates — not delivery dates.
       </div>
 
+      <div className="rounded-xl border border-slate-300 bg-white px-4 py-4 text-sm text-slate-800">
+        <strong className="block text-base mb-1">One year after landfall — the verified picture</strong>
+        Hurricane Melissa made landfall near New Hope, Westmoreland on 28 October 2025. Electricity is largely back: {VERIFIED_METRICS.jpsRestorationPercent}% of JPS customers, {VERIFIED_METRICS.nwcRestorationPercent}% of water services. But the relief money tells a different story: against {`US$${(VERIFIED_METRICS.damageEstimateFinalUSD / 1e9).toFixed(1)}B`} in total damage, roughly {`J$${(VERIFIED_METRICS.totalDonationsJMD / 1e9).toFixed(1)}B`} (≈US${(VERIFIED_METRICS.totalDonationsUSD / 1e6).toFixed(0)}M) has been raised through the official relief fund — and no public breakdown shows how much of that cash has actually reached affected households. {`US$${(VERIFIED_METRICS.multilateralFinancingUSD / 1e9).toFixed(1)}B`} in multilateral reconstruction financing is pledged, not disbursed, leaving a {`US$${(VERIFIED_METRICS.financingGapUSD / 1e9).toFixed(1)}B`} gap. Confirmed human cost: {VERIFIED_METRICS.deaths} deaths, {VERIFIED_METRICS.displacedPersons.toLocaleString()} displaced at peak, {VERIFIED_METRICS.schoolsAffected}+ schools damaged with only {VERIFIED_METRICS.schoolGeneratorsNET} generators provided as of April 2026. <em>Every figure links to its source in this ledger.</em>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <KPICard
           title="Documented Cash Records"
@@ -79,9 +85,11 @@ const Overview: React.FC = () => {
           color="blue"
         />
         <KPICard
-          title="Cash Records Marked Distributed"
+          title="Cash Tracked as Disbursed"
           value={formatCurrency(kpis.totalDisbursed)}
-          subValue={`${distributionRate}% of documented cash records`}
+          subValue={kpis.totalDisbursed === 0
+            ? 'No public per-household cash disbursement breakdown exists'
+            : `${distributionRate}% of documented cash records`}
           icon={Truck}
           color="purple"
         />

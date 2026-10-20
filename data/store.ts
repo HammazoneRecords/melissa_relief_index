@@ -159,13 +159,19 @@ export function getSourceById(id: string): SourceDocument | undefined {
 // ─── Computed KPIs ────────────────────────────────────────────────────────────
 export function getKPIs(): KPIMetrics {
   const donations = getDonations();
+  // Sub-claims (e.g. don-012 diaspora fund inside the don-001 aggregate fund)
+  // are excluded from cash totals to avoid double-counting.
+  const isSubClaim = (d: Donation) => !!d.provenance?.parentClaimId;
+  const topLevelCash = donations.filter(
+    d => d.type === DonationType.CASH && !isSubClaim(d)
+  );
 
-  const totalCashReceived = donations
-    .filter(d => d.type === DonationType.CASH && d.status !== Status.PLEDGED && d.status !== Status.FAILED)
+  const totalCashReceived = topLevelCash
+    .filter(d => d.status !== Status.PLEDGED && d.status !== Status.FAILED)
     .reduce((sum, d) => sum + d.amount, 0);
 
-  const totalDisbursed = donations
-    .filter(d => d.type === DonationType.CASH && d.status === Status.DISTRIBUTED)
+  const totalDisbursed = topLevelCash
+    .filter(d => d.status === Status.DISTRIBUTED)
     .reduce((sum, d) => sum + d.amount, 0);
 
   const reports = getReports();
@@ -363,7 +369,8 @@ export function getCategoryTotals(): CategoryTotal[] {
     const existing = byCategory.get(cat) ?? { amount: 0, count: 0, subCount: 0, unit };
     existing.count++;
     if (subIds.has(d.id)) existing.subCount++;
-    if (d.type === DonationType.CASH && d.status !== Status.PLEDGED && d.status !== Status.FAILED) {
+    if (d.type === DonationType.CASH && !d.provenance?.parentClaimId
+        && d.status !== Status.PLEDGED && d.status !== Status.FAILED) {
       existing.amount += d.amount;
     }
     byCategory.set(cat, existing);

@@ -4,7 +4,10 @@ import { saveDonation, saveReport, savePromise, getDonations, getReports, getPro
 import { DonorType, DonationType, Status } from '../types';
 import { PARISHES } from '../data/store';
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'mri2026';
+// Admin panel is DISABLED unless VITE_ADMIN_PASSWORD is set at build time.
+// No default password is shipped — a hardcoded fallback would expose the edit
+// surface to anyone reading the public bundle.
+const ADMIN_PASSWORD: string | undefined = import.meta.env.VITE_ADMIN_PASSWORD;
 
 interface Props {
   onClose: () => void;
@@ -373,6 +376,23 @@ const AdminPanel: React.FC<Props> = ({ onClose }) => {
   const [panel, setPanel]     = useState<Panel>('inbox');
   const [prefillUrl, setPrefillUrl] = useState('');
   const [saved, setSaved]     = useState(false);
+
+  if (!ADMIN_PASSWORD) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md text-center">
+          <Lock className="w-8 h-8 mx-auto text-gray-400 mb-3" />
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Admin panel disabled</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            No admin credentials are configured in this public build. Data entry is disabled; the ledger is read-only.
+          </p>
+          <button onClick={onClose} className="px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-medium hover:bg-slate-800">
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const jumpTo = (p: Panel, url: string) => {
     setPrefillUrl(url);
