@@ -11,6 +11,7 @@ const Header: React.FC<HeaderProps> = ({ activeTab, setActiveTab, onAdminOpen })
   const navItems = [
     { id: 'overview', label: 'Situation' },
     { id: 'donations', label: 'Assistance' },
+    { id: 'breakdowns', label: 'Individual Breakdowns' },
     { id: 'distribution', label: 'Parish Needs' },
     { id: 'accountability', label: 'Recovery Commitments' },
     { id: 'reports', label: 'Evidence Records' },

@@ -7,6 +7,7 @@ import CommunityMap from './views/CommunityMap';
 import Reports from './views/Reports';
 import Verification from './views/Verification';
 import Methods from './views/Methods';
+import IndividualBreakdowns from './views/IndividualBreakdowns';
 import AdminPanel from './components/AdminPanel';
 
 // ─── Public Information Architecture (Task 003) ────────────────────────────
@@ -17,10 +18,20 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [adminOpen, setAdminOpen] = useState(false);
 
+  React.useEffect(() => {
+    const onNavigate = (e: Event) => {
+      const tab = (e as CustomEvent<string>).detail;
+      if (typeof tab === 'string') setActiveTab(tab);
+    };
+    window.addEventListener('mri-navigate', onNavigate);
+    return () => window.removeEventListener('mri-navigate', onNavigate);
+  }, []);
+
   const renderView = () => {
     switch (activeTab) {
       case 'overview': return <Overview />;
       case 'donations': return <Donations />;
+      case 'breakdowns': return <IndividualBreakdowns />;
       case 'distribution': return <CommunityMap />;
       case 'accountability': return <Accountability />;
       case 'reports': return <Reports />;

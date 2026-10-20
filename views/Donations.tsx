@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { getDonations, getSourceById } from '../data/store';
+import { getAttribution } from '../data/recipientData';
 import { Status, DonationType, SourceGrade } from '../types';
 import { Filter, Download, ExternalLink, AlertTriangle } from 'lucide-react';
 
@@ -41,7 +42,12 @@ const Donations: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Assistance</h2>
-          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} source-linked records. Only cash records carry a JMD amount; in-kind support is not monetised. In-kind entries marked "Distributed" reflect only the specific quantities named in their source document — no consolidated island-wide distribution total has been published.</p>
+          <p className="text-xs text-gray-500 mt-0.5">{filtered.length} source-linked records. Only cash records carry a JMD amount; in-kind support is not monetised. In-kind entries marked "Distributed" reflect only the specific quantities named in their source document — no consolidated island-wide distribution total has been published. "Distributed" here does not imply household-level delivery unless the source explicitly documents it.</p>
+          <p className="text-xs mt-2">
+            <a href="#" onClick={e => { e.preventDefault(); window.dispatchEvent(new CustomEvent('mri-navigate', { detail: 'breakdowns' })); }} className="text-blue-600 hover:text-blue-900 font-medium underline">
+              Per-contribution recipients &amp; disbursement status → Individual Breakdowns
+            </a>
+          </p>
         </div>
         <div className="flex space-x-2 mt-4 sm:mt-0">
           <div className="relative">
@@ -78,6 +84,7 @@ const Donations: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documented value</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parish</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stated recipient</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
               </tr>
@@ -98,6 +105,9 @@ const Donations: React.FC = () => {
                       : d.amount > 0 ? `Reported value: J$${d.amount.toLocaleString()}` : 'Not monetised'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{d.targetParish}</td>
+                  <td className="px-6 py-4 text-sm text-gray-700 max-w-[16rem]">
+                    {getAttribution(d).recipientName}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_COLORS[d.status]}`}>
                       {d.status}
